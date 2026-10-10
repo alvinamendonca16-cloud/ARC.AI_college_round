@@ -117,7 +117,7 @@ export const TARGETS = {
 };
 
 export const STATUS_LABELS = {
-  pending: 'Pending',
+  pending: 'Draft',
   applied: 'Deployed',
   rejected: 'Rejected',
   rolled_back: 'Rolled Back',
@@ -204,6 +204,34 @@ export function parseRequest(request) {
   match = input.match(/^change the buy now button(?: background color| color)? to (.+)$/i);
   if (match) {
     const newValue = normalizeColor(match[1]);
+    const error = validateValue('buy-now-button', 'backgroundColor', newValue);
+    return error ? { error } : { target: 'buy-now-button', property: 'backgroundColor', newValue };
+  }
+
+  match = input.match(/^change the buy now button(?: background colour| colour)? to (.+)$/i);
+  if (match) {
+    const newValue = normalizeColor(match[1]);
+    const error = validateValue('buy-now-button', 'backgroundColor', newValue);
+    return error ? { error } : { target: 'buy-now-button', property: 'backgroundColor', newValue };
+  }
+
+  match = input.match(/^change the primary button(?: background color| color| background colour| colour)? to (.+)$/i);
+  if (match) {
+    const newValue = normalizeColor(match[match.length - 1]);
+    const error = validateValue('buy-now-button', 'backgroundColor', newValue);
+    return error ? { error } : { target: 'buy-now-button', property: 'backgroundColor', newValue };
+  }
+
+  match = input.match(/^change (?:the )?(?:colour|color) of (?:the )?(?:buy now button|primary button) to (.+)$/i);
+  if (match) {
+    const newValue = normalizeColor(match[1]);
+    const error = validateValue('buy-now-button', 'backgroundColor', newValue);
+    return error ? { error } : { target: 'buy-now-button', property: 'backgroundColor', newValue };
+  }
+
+  match = input.match(/^change the (?:button|buy now button|primary button) (?:colour|color) to (.+)$/i);
+  if (match) {
+    const newValue = normalizeColor(match[2]);
     const error = validateValue('buy-now-button', 'backgroundColor', newValue);
     return error ? { error } : { target: 'buy-now-button', property: 'backgroundColor', newValue };
   }
