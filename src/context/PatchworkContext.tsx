@@ -348,51 +348,75 @@ export function PatchworkProvider({ children }: { children: ReactNode }) {
   );
 
   // ---- Rollback ----
+  
+  // ---- Rollback ----
   const rollbackToVersion = useCallback(
     (version: number): { success: boolean; message: string } => {
       const targetVersion = versions.find((v) => v.version === version);
+
       if (!targetVersion) {
         const msg = `Cannot rollback: version ${version} does not exist.`;
         addAuditEvent('ROLLBACK_FAILED', msg, undefined, version);
         return { success: false, message: msg };
       }
 
-      if (version === currentVersion) {
-        const msg = `Cannot rollback: version ${version} is already the current version.`;
+      if (version >= currentVersion) {
+        const msg = `Cannot rollback: version ${version} is the current or a future version.`;
         addAuditEvent('ROLLBACK_FAILED', msg, undefined, version);
         return { success: false, message: msg };
       }
 
-      // Find patches that would be undone
-      const undoneVersions = versions.filter((v) => v.version > version && v.version <= currentVersion);
+      // Identify patches that will be undone.
+      const undoneVersions = versions.filter(
+        (v) => v.version > version && v.version <= currentVersion
+      );
       const undonePatchIds = undoneVersions.flatMap((v) => v.patchIds);
 
-      // Restore state from the target version
-      setWebsiteState(targetVersion.state);
-      setCurrentVersion(version);
+      // Keep version numbers increasing after rollback.
+      const newVersionNumber =
+        Math.max(...versions.map((v) => v.version), currentVersion) + 1;
 
-      // Mark deployed patches that are being rolled back
+      const rollbackVersion: Version = {
+        version: newVersionNumber,
+        timestamp: Date.now(),
+        state: { ...targetVersion.state },
+        patchIds: [],
+        description: `Rollback: restored website state from v${version}`,
+      };
+
+      // Restore the website and record the new version.
+      setWebsiteState({ ...targetVersion.state });
+      setVersions((prev) => [...prev, rollbackVersion]);
+      setCurrentVersion(newVersionNumber);
+
+      // Mark undone patches and clear outdated verification results.
       setPatches((prev) =>
         prev.map((p) => {
           if (undonePatchIds.includes(p.id) && p.status === 'deployed') {
-            return { ...p, status: 'rolled_back', rolledBackAt: Date.now(), rolledBackByVersion: version };
+            return {
+              ...p,
+              status: 'rolled_back',
+              rolledBackAt: Date.now(),
+              rolledBackByVersion: newVersionNumber,
+            };
           }
-          return p;
-        }),
-      );
 
-      // Clear verification on remaining patches (they may now be stale)
-      setPatches((prev) =>
-        prev.map((p) => {
           if (p.status === 'pending' || p.status === 'approved') {
             return { ...p, verification: null };
           }
+
           return p;
-        }),
+        })
       );
 
-      const msg = `Rolled back from version ${currentVersion} to version ${version}. Undone patches: ${undonePatchIds.length > 0 ? undonePatchIds.join(', ') : 'none'}.`;
-      addAuditEvent('ROLLBACK_SUCCESS', msg, undefined, version);
+      const msg =
+        `Rolled back from v${currentVersion} to the state of v${version}. ` +
+        `New version v${newVersionNumber} created. ` +
+        `Undone patches: ${
+          undonePatchIds.length > 0 ? undonePatchIds.join(', ') : 'none'
+        }.`;
+
+      addAuditEvent('ROLLBACK_SUCCESS', msg, undefined, newVersionNumber);
 
       return { success: true, message: msg };
     },
