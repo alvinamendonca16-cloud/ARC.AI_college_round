@@ -30,9 +30,20 @@ export function PatchProvider({ children }) {
   const [verificationRuns, setVerificationRuns] = useStoredState('patchwork.verifications', []);
   const [releases, setReleases] = useStoredState('patchwork.releases', []);
   const [layoutShifted, setLayoutShifted] = useStoredState('patchwork.layoutShifted', false);
+  const [versions, setVersions] = useStoredState('patchwork.versions', [{
+    versionId: 'v-0',
+    versionNumber: 0,
+    label: 'Original',
+    snapshot: INITIAL_WEBSITE_STATE,
+    createdAt: new Date().toISOString(),
+    isOriginal: true,
+  }]);
+  const [currentVersionId, setCurrentVersionId] = useStoredState('patchwork.currentVersionId', 'v-0');
+  const [deployedVersionId, setDeployedVersionId] = useStoredState('patchwork.deployedVersionId', 'v-0');
   const nextId = useRef(Math.max(0, ...patches.map((patch) => Number(patch.id?.match(/\d+$/)?.[0] ?? 0))) + 1);
   const nextEventId = useRef(Math.max(0, ...auditEntries.map((entry) => Number(entry.id?.match(/\d+$/)?.[0] ?? 0))) + 1);
   const nextReleaseNumber = useRef(Math.max(0, ...releases.map((release) => Number(release.version?.match(/\d+$/)?.[0] ?? 0))) + 1);
+  const nextVersionNumber = useRef(Math.max(0, ...versions.map((ver) => Number(ver.versionNumber ?? 0))) + 1);
   const deployingPatchIds = useRef(new Set());
   const deployedPatchIds = useRef(new Set(patches.filter((patch) => patch.status === 'applied').map((patch) => patch.id)));
 
@@ -78,8 +89,19 @@ export function PatchProvider({ children }) {
     setVerificationRuns([]);
     setReleases([]);
     setLayoutShifted(false);
+    setVersions([{
+      versionId: 'v-0',
+      versionNumber: 0,
+      label: 'Original',
+      snapshot: INITIAL_WEBSITE_STATE,
+      createdAt: new Date().toISOString(),
+      isOriginal: true,
+    }]);
+    setCurrentVersionId('v-0');
+    setDeployedVersionId('v-0');
     nextReleaseNumber.current = 1;
     nextId.current = 1;
+    nextVersionNumber.current = 1;
     deployedPatchIds.current.clear();
     recordAudit('workspace_created', isDemo ? 'Built-in demo workspace opened' : `External workspace opened for ${nextWorkspace.hostname}`, DEVELOPERS[0], { workspaceId: nextWorkspace.id });
     return nextWorkspace;
@@ -263,6 +285,12 @@ export function PatchProvider({ children }) {
       setPatches((current) => current.map((record) =>
         record.id === id ? { ...record, status: 'applied', deployedBy: actor, releaseVersion: version, appliedAt: deployedAt } : record,
       ));
+      
+      // Create a version snapshot for this deployment
+      const versionSnapshot = createVersionSnapshot(id, `Deployed: ${patch.target} ${patch.newValue}`);
+      setDeployedVersionId(versionSnapshot.versionId);
+      setCurrentVersionId(versionSnapshot.versionId);
+      
       setReleases((current) => [{
         version, patchId: id, target: patch.target, property: patch.property,
         oldValue: patch.oldValue, newValue: patch.newValue, action: 'deploy', status: 'deployed',
@@ -382,12 +410,90 @@ export function PatchProvider({ children }) {
     return { ok: true, message: 'Element ID changed. Revalidate patches to test semantic recovery.' };
   }
 
+  function createVersionSnapshot(patchId, label) {
+    const versionId = `v-${Date.now().toString(36)}`;
+    const newVersion = {
+      versionId,
+      versionNumber: nextVersionNumber.current,
+      label: label || `Version ${nextVersionNumber.current}`,
+      snapshot: websiteState,
+      createdAt: new Date().toISOString(),
+      patchId,
+      isOriginal: false,
+    };
+    nextVersionNumber.current += 1;
+    setVersions((current) => [newVersion, ...current]);
+    return newVersion;
+  }
+
+  function switchToVersion(versionId) {
+    const version = versions.find((v) => v.versionId === versionId);
+    if (!version) return { ok: false, message: 'Version not found.' };
+    setCurrentVersionId(versionId);
+    return { ok: true, message: `Switched to ${version.label}` };
+  }
+
+  function getPreviousVersion() {
+    const currentIndex = versions.findIndex((v) => v.versionId === currentVersionId);
+    if (currentIndex >= 0 && currentIndex < versions.length - 1) {
+      return versions[currentIndex + 1];
+    }
+    return null;
+  }
+
+  function getNextVersion() {
+    const currentIndex = versions.findIndex((v) => v.versionId === currentVersionId);
+    if (currentIndex > 0) {
+      return versions[currentIndex - 1];
+    }
+    return null;
+  }
+
+  function switchToPreviousVersion() {
+    const prev = getPreviousVersion();
+    if (!prev) return { ok: false, message: 'No earlier version available.' };
+    return switchToVersion(prev.versionId);
+  }
+
+  function switchToNextVersion() {
+    const next = getNextVersion();
+    if (!next) return { ok: false, message: 'No later version available.' };
+    return switchToVersion(next.versionId);
+  }
+
+  function restoreVersion(versionId, actor) {
+    const version = versions.find((v) => v.versionId === versionId);
+    if (!version) return { ok: false, message: 'Version not found.' };
+    if (version.versionId === deployedVersionId) {
+      return { ok: false, message: 'This version is already deployed.' };
+    }
+    
+    setWebsiteState(version.snapshot);
+    setCurrentVersionId(versionId);
+    
+    const restoredVersion = createVersionSnapshot(null, `Restored: ${version.label}`);
+    recordAudit('version_restored', `Restored from ${version.label} back to working state`, actor, { versionId, restoredVersionId: restoredVersion.versionId });
+    
+    return { ok: true, message: `Restored to ${version.label} (new version created)` };
+  }
+
+  function getCurrentVersionSnapshot() {
+    return versions.find((v) => v.versionId === currentVersionId) || versions[0];
+  }
+
+  function getDeployedVersionSnapshot() {
+    return versions.find((v) => v.versionId === deployedVersionId) || versions[0];
+  }
+
   return (
     <PatchContext.Provider value={{
       workspace, websiteState, patches, auditEntries, verificationRuns, releases, layoutShifted,
+      versions, currentVersionId, deployedVersionId,
       createWorkspace, addComment, updatePatch, revalidatePatches, resolveTargetReview, resolveConflict, resetPreview,
       createPatch, recordVerification, applyPatch, rejectPatch, rollbackPatch,
       simulateUpstreamChange, moveElement, simulateElementIdChange,
+      createVersionSnapshot, switchToVersion, switchToPreviousVersion, switchToNextVersion, restoreVersion,
+      getPreviousVersion, getNextVersion, getCurrentVersionSnapshot, getDeployedVersionSnapshot, setDeployedVersionId,
     }}>
       {children}
     </PatchContext.Provider>

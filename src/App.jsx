@@ -15,6 +15,7 @@ import { ReleasePanel } from './components/ReleasePanel.jsx';
 import { SampleWebsite } from './components/SampleWebsite.jsx';
 import { TeamPanel } from './components/TeamPanel.jsx';
 import { VerificationPanel } from './components/VerificationPanel.jsx';
+import { VersionHistory } from './components/VersionHistory.jsx';
 import { VisualInspector } from './components/VisualInspector.jsx';
 import { DEVELOPERS, usePatches } from './context/PatchContext.jsx';
 import { COLOR_VALUES, formatStatus, getConflicts, getPatchRevision, resolveSmartTarget, TARGETS, validateProposal } from './utils/patchUtils.js';
@@ -72,9 +73,12 @@ function readRenderedValue(element, patch) {
 export default function App() {
   const {
     workspace, websiteState, patches, auditEntries, verificationRuns, releases, layoutShifted,
+    versions, currentVersionId, deployedVersionId,
     createWorkspace, createPatch, recordVerification, applyPatch, rejectPatch, rollbackPatch,
     simulateUpstreamChange, moveElement, addComment, updatePatch, revalidatePatches,
     resolveTargetReview, resolveConflict, resetPreview, simulateElementIdChange,
+    createVersionSnapshot, switchToVersion, switchToPreviousVersion, switchToNextVersion, restoreVersion,
+    getPreviousVersion, getNextVersion, getCurrentVersionSnapshot, getDeployedVersionSnapshot, setDeployedVersionId,
   } = usePatches();
   const [view, setView] = useState(workspace ? 'workspace' : 'landing');
   const [selectedId, setSelectedId] = useState(null);
@@ -270,6 +274,10 @@ export default function App() {
     ? { ...websiteState, [selectedPatch.target]: { ...websiteState[selectedPatch.target], [selectedPatch.property]: selectedPatch.newValue } }
     : websiteState;
 
+  // Get the version snapshot to display for preview (use current version if different from deployed)
+  const currentVersionSnapshot = getCurrentVersionSnapshot();
+  const versionWebsiteState = currentVersionSnapshot?.snapshot || websiteState;
+
   if (view === 'landing') return <LandingPage onOpenWorkspace={openWorkspace} onNavigate={setView} />;
 
   const currentPage = view === 'workspace' ? 'Workspace'
@@ -307,14 +315,14 @@ export default function App() {
                 <div className="viewport-frame" ref={viewportFrameRef} data-viewport={viewport}>
                   <div className="viewport-canvas-wrap" style={{ height: `${canvasMetrics.height}px` }}>
                     <div className={`viewport-canvas canvas-${viewport} ${previewMode === 'compare' ? 'compare-previews' : ''}`} ref={viewportCanvasRef} style={{ width: `${VIEWPORT_WIDTHS[viewport]}px`, transform: `translateX(-50%) scale(${canvasMetrics.scale})`, transformOrigin: 'top center' }}>
-                  {previewMode === 'compare' ? <><div className="compare-side"><span>ORIGINAL</span><SampleWebsite websiteState={websiteState} selectedTarget={selectedTarget} selectionMode={selectionMode} onSelectTarget={handleElementSelected} layoutShifted={layoutShifted} onToggleLayout={() => moveElement()} onSimulateUpstreamChange={handleSimulatedUpstreamChange} showControls={false} /></div><div className="compare-side"><span>PROPOSED {selectedPatch?.id ?? ''}</span><SampleWebsite websiteState={proposedState} selectedTarget={selectedTarget} selectionMode={false} onSelectTarget={handleElementSelected} layoutShifted={layoutShifted} onToggleLayout={() => moveElement()} onSimulateUpstreamChange={handleSimulatedUpstreamChange} showControls={false} /></div></> : <SampleWebsite websiteState={previewMode === 'patched' ? proposedState : websiteState} selectedTarget={selectedTarget} selectionMode={selectionMode} onSelectTarget={handleElementSelected} layoutShifted={layoutShifted} onToggleLayout={() => { moveElement(); setMessage({ type: 'success', text: 'The product moved in the DOM. Stable and semantic context can re-locate its patches.' }); }} onSimulateUpstreamChange={handleSimulatedUpstreamChange} onSimulateElementIdChange={() => { const result = simulateElementIdChange(selectedPatch?.target ?? selectedTarget ?? 'buy-now-button', activeDeveloper); setMessage({ type: result.ok ? 'success' : 'error', text: result.message }); }} showControls />}
+                  {previewMode === 'compare' ? <><div className="compare-side"><span>ORIGINAL</span><SampleWebsite websiteState={websiteState} selectedTarget={selectedTarget} selectionMode={selectionMode} onSelectTarget={handleElementSelected} layoutShifted={layoutShifted} onToggleLayout={() => moveElement()} onSimulateUpstreamChange={handleSimulatedUpstreamChange} showControls={false} /></div><div className="compare-side"><span>PROPOSED {selectedPatch?.id ?? ''}</span><SampleWebsite websiteState={proposedState} selectedTarget={selectedTarget} selectionMode={false} onSelectTarget={handleElementSelected} layoutShifted={layoutShifted} onToggleLayout={() => moveElement()} onSimulateUpstreamChange={handleSimulatedUpstreamChange} showControls={false} /></div></> : <SampleWebsite websiteState={previewMode === 'patched' ? proposedState : versionWebsiteState} selectedTarget={selectedTarget} selectionMode={selectionMode} onSelectTarget={handleElementSelected} layoutShifted={layoutShifted} onToggleLayout={() => { moveElement(); setMessage({ type: 'success', text: 'The product moved in the DOM. Stable and semantic context can re-locate its patches.' }); }} onSimulateUpstreamChange={handleSimulatedUpstreamChange} onSimulateElementIdChange={() => { const result = simulateElementIdChange(selectedPatch?.target ?? selectedTarget ?? 'buy-now-button', activeDeveloper); setMessage({ type: result.ok ? 'success' : 'error', text: result.message }); }} showControls />}
                     </div>
                   </div>
                 </div>
                 <VisualInspector activeDeveloper={activeDeveloper} createPatch={createPatch} onCreated={handlePatchCreated} onMessage={setMessage} selectedTarget={selectedTarget} setSelectedTarget={setSelectedTarget} selectionMode={selectionMode} setSelectionMode={setSelectionMode} websiteState={websiteState} />
                 <p className="state-note"><span>i</span> {previewMode === 'patched' ? 'Proposed changes are rendered temporarily and are not deployed.' : 'Changes remain local to PATCHWORK. External production sites are never modified.'}</p>
               </section>
-              <aside className="editor-right"><PatchPreview patch={selectedPatch} currentValue={selectedPatch ? websiteState[selectedPatch.target]?.[selectedPatch.property] : undefined} latestRun={latestRun} verificationCurrent={verificationCurrent} isDeploying={deployingId === selectedPatch?.id} hasConflict={hasConflict} activeDeveloper={activeDeveloper} locatorState={locatorState} onDeploy={() => handleDeploy(selectedPatch?.id)} onReject={() => runAction(rejectPatch, selectedPatch.id)} onUpdate={(value) => { const result = updatePatch(selectedPatch.id, value, activeDeveloper); setMessage({ type: result.ok ? 'success' : 'error', text: result.message }); return result; }} onAddComment={(text) => { const result = addComment(selectedPatch.id, text, activeDeveloper); setMessage({ type: result.ok ? 'success' : 'error', text: result.message }); return result; }} onResolveTargetReview={(accepted) => { const result = resolveTargetReview(selectedPatch.id, accepted, activeDeveloper); setMessage({ type: result.ok ? 'success' : 'error', text: result.message }); }} /><VerificationPanel patch={selectedPatch} latestRun={latestRun} isRunning={isChecking} onRun={runBrowserChecks} /></aside>
+              <aside className="editor-right"><PatchPreview patch={selectedPatch} currentValue={selectedPatch ? websiteState[selectedPatch.target]?.[selectedPatch.property] : undefined} latestRun={latestRun} verificationCurrent={verificationCurrent} isDeploying={deployingId === selectedPatch?.id} hasConflict={hasConflict} activeDeveloper={activeDeveloper} locatorState={locatorState} onDeploy={() => handleDeploy(selectedPatch?.id)} onReject={() => runAction(rejectPatch, selectedPatch.id)} onUpdate={(value) => { const result = updatePatch(selectedPatch.id, value, activeDeveloper); setMessage({ type: result.ok ? 'success' : 'error', text: result.message }); return result; }} onAddComment={(text) => { const result = addComment(selectedPatch.id, text, activeDeveloper); setMessage({ type: result.ok ? 'success' : 'error', text: result.message }); return result; }} onResolveTargetReview={(accepted) => { const result = resolveTargetReview(selectedPatch.id, accepted, activeDeveloper); setMessage({ type: result.ok ? 'success' : 'error', text: result.message }); }} /><VerificationPanel patch={selectedPatch} latestRun={latestRun} isRunning={isChecking} onRun={runBrowserChecks} /><VersionHistory versions={versions} currentVersionId={currentVersionId} deployedVersionId={deployedVersionId} getPreviousVersion={getPreviousVersion} getNextVersion={getNextVersion} switchToPreviousVersion={switchToPreviousVersion} switchToNextVersion={switchToNextVersion} switchToVersion={switchToVersion} restoreVersion={restoreVersion} activeDeveloper={activeDeveloper} onMessage={setMessage} /></aside>
             </div>
             <footer className="app-footer"><span>PATCHWORK <i>×</i> SONORA DEMO</span><span>Simulated releases · local-only collaboration · data persists in this browser</span></footer>
           </>}
