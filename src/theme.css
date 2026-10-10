@@ -36,47 +36,96 @@ button { color: inherit; }
 button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid #73e0ee; outline-offset: 3px; }
 
 /* Landing */
-.landing-shell { color: #e9efff; background: radial-gradient(ellipse at 78% 14%, #42389326, transparent 36%), #080c15; }
-.landing-header { max-width: 1440px; border-color: #273149; background: #090e19d9; }
-.landing-brand { color: #f0f3ff; }
-.brand-mark i { background: #8c81ff; }.brand-mark i:nth-child(2) { background: #57d4e7; }.brand-mark i:nth-child(3) { background: #b28cff; }
-.landing-header nav a, .landing-header nav button, .landing-footer nav a, .landing-footer nav button { color: #a1afc8; }
-.landing-header nav a:hover, .landing-header nav button:hover, .landing-footer nav a:hover, .landing-footer nav button:hover { color: #79e1ef; }
-.landing-start { color: #f7f7ff; background: linear-gradient(110deg, #655be0, #347aaf); border: 1px solid #9a91ff6b; box-shadow: 0 7px 24px #5148ce27; }
-.landing-start:hover { background: linear-gradient(110deg, #796ef4, #4295c4); box-shadow: 0 0 0 3px #8478ff24, 0 8px 26px #5d56cf35; }
-.landing-hero { max-width: 1360px; }
-.landing-hero .eyebrow, .eyebrow { color: #92a2bf; }
-.eyebrow-rule { background: linear-gradient(90deg, #8a7cff, #56d8e8); }
-.landing-hero h1 { color: #f1f4ff; }
-.landing-hero h1 span { color: #70dbea; }
-.hero-description, .intro-copy { color: #a3afc5; }
-.url-entry { background: #111a2aeb; border-color: #34415a; box-shadow: 0 16px 48px #0006, inset 0 1px #ffffff0a; }
-.url-entry > label { color: #e7ebfa; }
-.url-input-row { color: #93a2bb; border-color: #37435b; background: #0a111e; }
-.url-input-row input { color: #edf2ff; }
-.url-input-row input::placeholder { color: #67758d; }
-.url-input-row button { color: #fbfbff; background: #655be0; border: 1px solid #9288ff60; }
-.url-input-row button:hover:not(:disabled) { background: #7a70f0; }
-.url-entry .field-hint { color: #8292ac; }
-.landing-connection-state { margin-top: 11px; display: flex; align-items: center; gap: 7px; color: #9cabc2; font: 8px 'DM Mono', monospace; }.landing-connection-state span { width: 6px; height: 6px; border-radius: 50%; background: #62ddb3; box-shadow: 0 0 9px #62ddb377; }.landing-connection-state i { width: 3px; height: 3px; margin: 0 3px; border-radius: 50%; background: #53617a; }
-.field-error { color: #ff9aa9; }
-.demo-link { color: #70d9e7; }
-.demo-link:hover { color: #b0f4f8; }
-.hero-visual::before { background-color: #151b32; background-image: linear-gradient(#ffffff0b 1px, transparent 1px), linear-gradient(90deg, #ffffff0b 1px, transparent 1px); box-shadow: inset 0 0 80px #8375ff12; }
-.hero-window { color: #e9efff; background: #111a2a; border-color: #46516d; box-shadow: 0 28px 68px #0008, 0 0 45px #756aff1b; }
-.hero-window-bar { background: #0d1421; border-color: #29344a; }.hero-window-bar small { color: #8b9bb7; }
-.hero-product-image { background: linear-gradient(135deg, #242741, #182432); }.headphone-shape { border-color: #94a9d1; }.headphone-shape::before, .headphone-shape::after { background: #94a9d1; }
-.hero-product-lines i { background: #2b3850; }.hero-product-lines i:first-child { background: #766be2; }.hero-product-lines b { background: #3d4961; }
-.hero-compare { border-color: #29364b; }.hero-compare small { color: #9eabc2; }.hero-old-button, .hero-new-button { background: #315e9c; }.hero-new-button { background: #357f97; box-shadow: 0 0 0 3px #56d5e526; }
-.hero-patch-tag { color: #9ce8ef; background: #142936; border-color: #347a88; }
-.hero-side-label { color: #9da9c0; }.hero-side-label span, .hero-bottom-line { color: #75839c; }
-.hero-bottom-line i { background: #39445c; }
-.how-section, .features-section { border-color: #273149; }
-.section-heading h2 { color: #eff3ff; }.section-heading > p { color: #9aa8c0; }
-.steps-grid { border-color: #29354a; }.steps-grid article + article { border-color: #29354a; }.steps-grid article > span { color: #78dcea; }.steps-grid h3 { color: #e7edfd; }.steps-grid p { color: #9aa8bf; }
-.features-section { background: linear-gradient(180deg, #0d1422, #0a101a); }
-.feature-grid { border-color: #29364c; }.landing-feature { color: #dbe4f8; background: #111a29; border-color: #29364c; }.landing-feature > svg { color: #8d83ff; }.feature-number { color: #75859f; }.landing-feature h3 { color: #e6ecfb; }.landing-feature p { color: #9aa8bf; }
-.landing-footer { color: #dce4f5; }.landing-footer p { color: #8494ae; }
+.landing-shell {
+  position: relative;
+  overflow-x: clip;
+  background: #04070d !important;
+}
+
+.landing-shell.landing-immersive {
+  height: 280vh;
+  background: #04070d !important;
+}
+
+.landing-immersive__scene {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  height: 100svh;
+  perspective: 1600px;
+  background: #5b8fd2;
+  z-index: 1;
+}
+
+.landing-immersive__cloudfield {
+  position: absolute;
+  inset: 0;
+  background: #5b8fd2;
+}
+
+.landing-immersive__cloudworld {
+  position: absolute;
+  inset: 0;
+  perspective: 1600px;
+  perspective-origin: 50% 50%;
+  transform-style: preserve-3d;
+}
+
+.landing-immersive__image {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  z-index: 1;
+  will-change: opacity;
+}
+
+.cloud-flight__cloud {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: center;
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+}
+
+.cloud-flight__cloud img {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+}
+
+.landing-immersive__app {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  overflow: auto;
+  will-change: opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cloud-flight__cloud,
+  .landing-immersive__image,
+  .landing-immersive__app {
+    will-change: auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .landing-shell.landing-immersive {
+    height: 260vh;
+  }
+
+  .cloud-flight__cloud {
+    width: min(100vw, 680px) !important;
+  }
+}
 
 /* App shell and navigation */
 .dashboard-layout { color: #e7edfa; background: #090e18; }
@@ -249,72 +298,6 @@ body { background-image: radial-gradient(ellipse at 82% -20%, #e2eee8 0, transpa
 ::selection { color: #17352a; background: #dcebad; }
 button, input, select { color: inherit; }
 button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid #4d8a71; outline-offset: 2px; }
-
-/* Landing */
-.landing-shell { color: #192b25; background: #f7f9f6; }
-.landing-header { border-color: #e1e8e2; background: #ffffffed; box-shadow: 0 3px 16px #23403108; }
-.landing-brand, .brand { color: #1c382d; }
-.brand-mark i { background: #347a60; }
-.brand-mark i:nth-child(2) { background: #68a6a0; }
-.brand-mark i:nth-child(3) { background: #a7bd62; }
-.landing-header nav a, .landing-header nav button, .landing-footer nav a, .landing-footer nav button { color: #64766d; }
-.landing-header nav a:hover, .landing-header nav button:hover, .landing-footer nav a:hover, .landing-footer nav button:hover { color: #25684e; }
-.landing-start { color: #ffffff; background: #276d52; border: 1px solid #276d52; box-shadow: 0 4px 12px #245c451c; }
-.landing-start:hover { background: #1d5b43; box-shadow: 0 6px 16px #245c4524; }
-.landing-hero .eyebrow, .eyebrow { color: #647d70; }
-.eyebrow-rule { background: #83a75a; }
-.landing-hero h1 { color: #18352b; }
-.landing-hero h1 span { color: #3c8065; }
-.hero-description, .intro-copy { color: #64746d; }
-.url-entry { background: #ffffff; border-color: #dbe5de; box-shadow: 0 12px 32px #1c38280c; }
-.url-entry > label { color: #2e493c; }
-.url-input-row { color: #74867d; border-color: #d5e0d8; background: #fbfdfb; }
-.url-input-row input { color: #263d32; }
-.url-input-row input::placeholder { color: #89978f; }
-.url-input-row button { color: #ffffff; background: #2d7257; border: 1px solid #2d7257; }
-.url-input-row button:hover:not(:disabled) { background: #215f47; }
-.url-entry .field-hint { color: #76877d; }
-.landing-connection-state { color: #66796e; }
-.landing-connection-state span { background: #39916c; box-shadow: 0 0 0 3px #39916c1b; }
-.landing-connection-state i { background: #aebbb1; }
-.field-error { color: #a53e49; }
-.demo-link { color: #2a7658; }
-.demo-link:hover { color: #194f3a; }
-.hero-visual::before { background-color: #eaf0e9; background-image: linear-gradient(#72917b13 1px, transparent 1px), linear-gradient(90deg, #72917b13 1px, transparent 1px); box-shadow: inset 0 0 65px #c4d9c822; }
-.hero-window { color: #243a30; background: #ffffff; border-color: #d6e0d8; box-shadow: 0 22px 48px #26433218; }
-.hero-window-bar { background: #f5f8f4; border-color: #e3e9e3; }
-.hero-window-bar small { color: #7b8980; }
-.hero-product-image { background: linear-gradient(135deg, #e8eee8, #e2eae5); }
-.headphone-shape { border-color: #344e42; }
-.headphone-shape::before, .headphone-shape::after { background: #344e42; }
-.hero-product-lines i { background: #dfe7e0; }
-.hero-product-lines i:first-child { background: #8da997; }
-.hero-product-lines b { background: #ccd8ce; }
-.hero-compare { border-color: #e1e8e1; }
-.hero-compare small { color: #75847b; }
-.hero-old-button { background: #3975bc; }
-.hero-new-button { background: #34775a; box-shadow: 0 0 0 3px #dceacb; }
-.hero-patch-tag { color: #2d6c53; background: #eff6eb; border-color: #d3e3ca; }
-.hero-side-label { color: #667a6d; }
-.hero-side-label span, .hero-bottom-line { color: #87958c; }
-.hero-bottom-line i { background: #c5d1c8; }
-.how-section, .features-section { border-color: #e0e7e0; }
-.section-heading h2 { color: #20392e; }
-.section-heading > p { color: #728078; }
-.steps-grid { border-color: #dfe7df; }
-.steps-grid article + article { border-color: #dfe7df; }
-.steps-grid article > span { color: #4b8767; }
-.steps-grid h3 { color: #2b4538; }
-.steps-grid p { color: #718078; }
-.features-section { background: #edf2ed; }
-.feature-grid { border-color: #dce5dd; }
-.landing-feature { color: #283e33; background: #f8faf7; border-color: #dce5dd; }
-.landing-feature > svg { color: #4a8065; }
-.feature-number { color: #8b9990; }
-.landing-feature h3 { color: #30483b; }
-.landing-feature p { color: #718078; }
-.landing-footer { color: #294035; }
-.landing-footer p { color: #77867e; }
 
 /* App shell and navigation */
 .dashboard-layout { color: #24372d; background: #f2f5f2; }

@@ -93,6 +93,7 @@ export default function App() {
   const [viewport, setViewport] = useState('desktop');
   const [elementSearch, setElementSearch] = useState('');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [landingJourney, setLandingJourney] = useState(!workspace);
   const viewportFrameRef = useRef(null);
   const viewportCanvasRef = useRef(null);
   const [canvasMetrics, setCanvasMetrics] = useState({ scale: 1, height: 400 });
@@ -141,6 +142,11 @@ export default function App() {
     setPreviewMode('original');
     setView('workspace');
     setMessage({ type: 'success', text: isDemo ? 'Built-in demo workspace is ready for visual patching.' : `Workspace created for ${nextWorkspace.hostname}. External site controls are view-only.` });
+  }
+
+  function returnToLanding() {
+    setLandingJourney(true);
+    setView('landing');
   }
 
   function handlePatchCreated(id) {
@@ -274,21 +280,21 @@ export default function App() {
     ? { ...websiteState, [selectedPatch.target]: { ...websiteState[selectedPatch.target], [selectedPatch.property]: selectedPatch.newValue } }
     : websiteState;
 
-  // Get the version snapshot to display for preview (use current version if different from deployed)
-  const currentVersionSnapshot = getCurrentVersionSnapshot();
-  const versionWebsiteState = currentVersionSnapshot?.snapshot || websiteState;
+// Get the version snapshot to display for preview (use current version if different from deployed)
+const currentVersionSnapshot = getCurrentVersionSnapshot();
+const versionWebsiteState = currentVersionSnapshot?.snapshot || websiteState;
 
-  if (view === 'landing') return <LandingPage onOpenWorkspace={openWorkspace} onNavigate={setView} />;
+if (view === 'landing') return <LandingPage onOpenWorkspace={openWorkspace} onNavigate={setView} />;
 
   const currentPage = view === 'workspace' ? 'Workspace'
     : view === 'history' ? 'Patches'
       : view === 'versions' ? 'History'
         : view === 'audit' ? 'Audit Trail' : 'Team';
 
-  return (
+  const dashboard = (
     <main className={`dashboard-layout ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
       <aside className="side-nav">
-        <div className="sidebar-brand-row"><button className="brand side-brand" onClick={() => setView('landing')} aria-label="Go to PATCHWORK home"><span className="brand-mark"><i /><i /><i /><i /></span><span><strong>PATCHWORK</strong><small>Hotfix the Internet.</small></span></button><button className="sidebar-collapse" title={sidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'} aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'} onClick={() => setSidebarCollapsed((current) => !current)}>{sidebarCollapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}</button></div>
+        <div className="sidebar-brand-row"><button className="brand side-brand" onClick={returnToLanding} aria-label="Go to PATCHWORK home"><span className="brand-mark"><i /><i /><i /><i /></span><span><strong>PATCHWORK</strong><small>Hotfix the Internet.</small></span></button><button className="sidebar-collapse" title={sidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'} aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'} onClick={() => setSidebarCollapsed((current) => !current)}>{sidebarCollapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}</button></div>
         <p className="sidebar-label">PROJECT</p>
         <div className="sidebar-nav">{navigation.map(({ id, label, icon: Icon }) => <button key={id} title={label} aria-current={view === id ? 'page' : undefined} className={view === id ? 'active' : ''} onClick={() => setView(id)}><Icon size={16} /><span>{label}</span>{id === 'history' && patches.length > 0 && <b>{patches.length}</b>}</button>)}</div>
         <div className="sidebar-workspace"><span className="workspace-dot" /><small>{workspace?.isDemo ? 'LOCAL DEMO' : 'EXTERNAL · READ ONLY'}</small><strong>{workspace?.hostname ?? 'No workspace'}</strong><span>{workspace?.url ?? 'Open a site to begin'}</span></div>
@@ -296,7 +302,7 @@ export default function App() {
       </aside>
       <div className="dashboard-main">
         <header className="workspace-topbar">
-          <div className="topbar-page"><button onClick={() => setView('landing')} aria-label="Back to Landing Page"><ArrowLeft size={16} /></button><span>PATCHWORK</span><i>/</i><strong>{currentPage}</strong><span className="topbar-site-name">{workspace?.hostname}</span></div>
+          <div className="topbar-page"><button onClick={returnToLanding} aria-label="Back to Landing Page"><ArrowLeft size={16} /></button><span>PATCHWORK</span><i>/</i><strong>{currentPage}</strong><span className="topbar-site-name">{workspace?.hostname}</span></div>
           <div className="topbar-tools"><span className="topbar-connection"><i />{workspace?.isDemo ? 'DEMO CONNECTED' : 'EXTERNAL · READ ONLY'}</span><span className="preview-only"><i /> PREVIEW ONLY</span><label className="developer-picker"><span>WORKING AS</span><select value={activeDeveloper} onChange={(event) => setActiveDeveloper(event.target.value)}>{DEVELOPERS.map((developer) => <option key={developer}>{developer}</option>)}</select></label></div>
         </header>
         {message && <div className={`toast-message toast-${message.type}`} role="status"><span aria-hidden="true">{message.type === 'success' ? '✓' : '!'}</span>{message.text}<button aria-label="Dismiss message" onClick={() => setMessage(null)}>×</button></div>}
@@ -336,4 +342,14 @@ export default function App() {
       </div>
     </main>
   );
+
+  if (landingJourney) {
+    return (
+      <LandingPage onOpenWorkspace={openWorkspace} onNavigate={returnToLanding}>
+        {view !== 'landing' && dashboard}
+      </LandingPage>
+    );
+  }
+
+  return dashboard;
 }
