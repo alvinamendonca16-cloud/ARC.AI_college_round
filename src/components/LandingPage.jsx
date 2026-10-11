@@ -5,16 +5,32 @@ import cloudFlightRight from '../assets/cloud-flight-source-right.png';
 
 const cloudSprites = [cloudFlightLeft, cloudFlightRight];
 
-const cloudCount = 20;
-const cloudFlight = Array.from({ length: cloudCount }, (_, index) => ({
-  id: index,
-  angle: -Math.PI / 2 + (index / cloudCount) * Math.PI * 2,
-  start: 0.12 + (index % 10) * 0.038 + Math.floor(index / 10) * 0.11,
-  duration: 0.3 + (index % 4) * 0.025,
-  size: 29 + ((index * 13) % 36),
-  sprite: index % cloudSprites.length,
-  rotation: ((index * 17) % 24) - 12,
-}));
+const cloudCount = 40;
+const cloudGridColumns = 8;
+const cloudGridRows = cloudCount / cloudGridColumns;
+const cloudRandom = (seed) => {
+  const value = Math.sin(seed * 127.1 + 311.7) * 43758.5453;
+  return value - Math.floor(value);
+};
+
+const cloudFlight = Array.from({ length: cloudCount }, (_, index) => {
+  const column = index % cloudGridColumns;
+  const row = Math.floor(index / cloudGridColumns);
+  const originX = 5 + ((column + 0.5 + (cloudRandom(index + 1) - 0.5) * 0.6) / cloudGridColumns) * 90;
+  const originY = 5 + ((row + 0.5 + (cloudRandom(index + 41) - 0.5) * 0.6) / cloudGridRows) * 90;
+
+  return {
+    id: index,
+    originX,
+    originY,
+    angle: Math.atan2(originY - 50, originX - 50) + (cloudRandom(index + 81) - 0.5) * 0.5,
+    start: 0.1 + cloudRandom(index + 121) * 0.28,
+    duration: 0.34 + cloudRandom(index + 161) * 0.1,
+    size: 29 + ((index * 13) % 36),
+    sprite: index % cloudSprites.length,
+    rotation: ((index * 17) % 24) - 12,
+  };
+});
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
@@ -77,10 +93,8 @@ export function LandingPage({ children, onOpenWorkspace, onNavigate }) {
             {cloudFlight.map((cloud) => {
               const phase = clamp((motionProgress - cloud.start) / cloud.duration, 0, 1);
               const travel = phase ** 1.15;
-              const radiusX = 74 + cloud.size * 0.65;
-              const radiusY = 66 + cloud.size * 0.52;
-              const x = Math.cos(cloud.angle) * radiusX * travel;
-              const y = Math.sin(cloud.angle) * radiusY * travel;
+              const x = Math.cos(cloud.angle) * 28 * travel;
+              const y = Math.sin(cloud.angle) * 30 * travel;
               const z = -500 + phase * 1600;
               const scale = 0.38 + phase * 0.78;
               const opacity = clamp(phase * 5, 0, 1) * clamp((1 - phase) * 5, 0, 1);
@@ -90,6 +104,8 @@ export function LandingPage({ children, onOpenWorkspace, onNavigate }) {
                   className="cloud-flight__cloud"
                   key={cloud.id}
                   style={{
+                    left: `${cloud.originX}%`,
+                    top: `${cloud.originY}%`,
                     width: `clamp(250px, ${cloud.size * 1.25}vw, 850px)`,
                     opacity: reducedMotion ? 0 : opacity * cloudEnvironmentOpacity,
                     transform: `translate3d(${x}vw, ${y}vh, ${z}px) translate(-50%, -50%) scale(${scale}) rotate(${cloud.rotation}deg)`,
