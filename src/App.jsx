@@ -19,6 +19,7 @@ import { VersionHistory } from './components/VersionHistory.jsx';
 import { VisualInspector } from './components/VisualInspector.jsx';
 import { DEVELOPERS, usePatches } from './context/PatchContext.jsx';
 import { COLOR_VALUES, formatStatus, getConflicts, getPatchRevision, resolveSmartTarget, TARGETS, validateProposal } from './utils/patchUtils.js';
+import patchworkLogo from './assets/patchwork-logo.png';
 
 const DEMO_URL = 'https://sonora.patchwork.local/';
 const VIEWPORT_WIDTHS = { desktop: 1280, tablet: 768, mobile: 390 };
@@ -294,7 +295,7 @@ if (view === 'landing') return <LandingPage onOpenWorkspace={openWorkspace} onNa
   const dashboard = (
     <main className={`dashboard-layout ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
       <aside className="side-nav">
-        <div className="sidebar-brand-row"><button className="brand side-brand" onClick={returnToLanding} aria-label="Go to PATCHWORK home"><span className="brand-mark"><i /><i /><i /><i /></span><span><strong>PATCHWORK</strong><small>Hotfix the Internet.</small></span></button><button className="sidebar-collapse" title={sidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'} aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'} onClick={() => setSidebarCollapsed((current) => !current)}>{sidebarCollapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}</button></div>
+        <div className="sidebar-brand-row"><button className="brand side-brand" onClick={returnToLanding} aria-label="Go to PATCHWORK home"><img className="brand-mark" src={patchworkLogo} alt="" /><span><strong>PATCHWORK</strong><small>Hotfix the Internet.</small></span></button><button className="sidebar-collapse" title={sidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'} aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'} onClick={() => setSidebarCollapsed((current) => !current)}>{sidebarCollapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}</button></div>
         <p className="sidebar-label">PROJECT</p>
         <div className="sidebar-nav">{navigation.map(({ id, label, icon: Icon }) => <button key={id} title={label} aria-current={view === id ? 'page' : undefined} className={view === id ? 'active' : ''} onClick={() => setView(id)}><Icon size={16} /><span>{label}</span>{id === 'history' && patches.length > 0 && <b>{patches.length}</b>}</button>)}</div>
         <div className="sidebar-workspace"><span className="workspace-dot" /><small>{workspace?.isDemo ? 'LOCAL DEMO' : 'EXTERNAL · READ ONLY'}</small><strong>{workspace?.hostname ?? 'No workspace'}</strong><span>{workspace?.url ?? 'Open a site to begin'}</span></div>

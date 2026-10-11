@@ -629,3 +629,385 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   .workspace-actions button { font-size: 9px; }
   .control-label select, .control-label input, .inspector-current input { min-height: 38px; }
 }
+
+/* PATCHWORK application palette. Kept under the dashboard root so the landing journey is unchanged. */
+.dashboard-layout {
+  --app-periwinkle: #8798E8;
+  --app-lavender: #AD7BD0;
+  --app-pink: #F09BB8;
+  --app-sage: #9DBE96;
+  --app-periwinkle-ink: #27335C;
+  --app-lavender-ink: #3D2853;
+  --app-pink-ink: #573142;
+  --app-sage-ink: #2F4933;
+  color: #253044;
+  background: rgb(255 198 217 / 84%);
+}
+
+.dashboard-layout .dashboard-main {
+  background: linear-gradient(
+    90deg,
+    rgb(168 181 240 / 90%) 0%,
+    rgb(200 162 232 / 90%) 50%,
+    rgb(255 198 217 / 90%) 100%
+  );
+}
+
+.dashboard-layout .side-nav {
+  color: #39405d;
+  background: #C5D8C0;
+  border-color: #ADC4A7;
+}
+
+.dashboard-layout .side-brand,
+.dashboard-layout .side-brand strong,
+.dashboard-layout .topbar-page strong {
+  color: #29314e;
+}
+
+.dashboard-layout .side-brand small,
+.dashboard-layout .sidebar-label,
+.dashboard-layout .sidebar-bottom,
+.dashboard-layout .topbar-page,
+.dashboard-layout .topbar-page > span,
+.dashboard-layout .topbar-site-name,
+.dashboard-layout .developer-picker span {
+  color: #68708a;
+}
+
+.dashboard-layout .sidebar-collapse,
+.dashboard-layout .topbar-page button,
+.dashboard-layout .developer-picker select {
+  color: #3f496d;
+  background: #fff;
+  border-color: #d8dcef;
+}
+
+.dashboard-layout .sidebar-collapse:hover,
+.dashboard-layout .topbar-page button:hover {
+  color: var(--app-periwinkle-ink);
+  background: #eef0fc;
+  border-color: var(--app-periwinkle);
+}
+
+.dashboard-layout .sidebar-nav button {
+  color: #59627e;
+}
+
+.dashboard-layout .sidebar-nav button svg,
+.dashboard-layout .panel-heading > svg,
+.dashboard-layout .element-panel .panel-heading > svg,
+.dashboard-layout .version-title > svg {
+  color: var(--app-lavender-ink);
+}
+
+.dashboard-layout .sidebar-nav button:hover {
+  color: #303957;
+  background: #E7D5F2;
+  border-color: var(--app-lavender);
+}
+
+.dashboard-layout .sidebar-nav button.active {
+  color: var(--app-periwinkle-ink);
+  background: var(--app-periwinkle);
+  border-color: #929fdd;
+  box-shadow: inset 3px 0 #7382cc;
+}
+
+.dashboard-layout .sidebar-nav button.active svg,
+.dashboard-layout .sidebar-nav button b {
+  color: var(--app-periwinkle-ink);
+}
+
+.dashboard-layout .sidebar-nav button b {
+  background: #CFD6FA;
+  border-color: var(--app-periwinkle);
+}
+
+.dashboard-layout .sidebar-workspace {
+  background: #fff;
+  border-color: #e0e2f0;
+}
+
+.dashboard-layout .sidebar-workspace small,
+.dashboard-layout .preview-only,
+.dashboard-layout .topbar-connection {
+  color: var(--app-sage-ink);
+}
+
+.dashboard-layout .workspace-dot,
+.dashboard-layout .topbar-connection i,
+.dashboard-layout .preview-only i,
+.dashboard-layout .live-indicator i,
+.dashboard-layout .selected-element-label i,
+.dashboard-layout .release-dot {
+  background: var(--app-sage);
+  box-shadow: 0 0 0 3px #9DBE9644;
+}
+
+.dashboard-layout .workspace-topbar {
+  color: #59627b;
+  background: #C5D8C0;
+  border-color: #ADC4A7;
+}
+
+.dashboard-layout .dashboard-content {
+  background: transparent;
+}
+
+.dashboard-layout .workspace-heading h1,
+.dashboard-layout .page-title h1 {
+  color: #29314e;
+}
+
+.dashboard-layout .workspace-heading h1 span,
+.dashboard-layout .member-metrics strong,
+.dashboard-layout .assigned-patches li strong,
+.dashboard-layout .change-values strong,
+.dashboard-layout .audit-event > span,
+.dashboard-layout .release-current i {
+  color: var(--app-sage-ink);
+}
+
+.dashboard-layout .workspace-heading > div:first-child > p:last-child,
+.dashboard-layout .page-title > p:last-child,
+.dashboard-layout .eyebrow {
+  color: #68718a;
+}
+
+.dashboard-layout .workspace-heading .eyebrow span {
+  color: var(--app-lavender);
+}
+
+.dashboard-layout .primary-button,
+.dashboard-layout .stage-button,
+.dashboard-layout .feature-action {
+  color: #263153;
+  background: var(--app-periwinkle);
+  border-color: #929fdd;
+  box-shadow: 0 3px 10px #5968a51c;
+}
+
+.dashboard-layout .primary-button:hover:not(:disabled),
+.dashboard-layout .stage-button:hover:not(:disabled),
+.dashboard-layout .feature-action:hover:not(:disabled) {
+  color: #263153;
+  background: #7486DB;
+  border-color: #687ACD;
+  box-shadow: 0 0 0 3px #8798E844;
+}
+
+.dashboard-layout .secondary-button,
+.dashboard-layout .workspace-actions .secondary-button {
+  color: #30203F;
+  background: var(--app-lavender);
+  border-color: #9664B9;
+}
+
+.dashboard-layout .secondary-button:hover,
+.dashboard-layout .workspace-actions .secondary-button:hover {
+  color: #261735;
+  background: #9D69C2;
+  border-color: #8958AE;
+}
+
+.dashboard-layout .text-button,
+.dashboard-layout .external-preview-toolbar a {
+  color: var(--app-periwinkle-ink);
+}
+
+.dashboard-layout .text-button:hover,
+.dashboard-layout .external-preview-toolbar a:hover {
+  color: #263153;
+}
+
+.dashboard-layout .generator input:focus,
+.dashboard-layout .element-search:focus-within {
+  border-color: #7384D6;
+  box-shadow: 0 0 0 3px #8798E844;
+}
+
+.dashboard-layout button:focus-visible,
+.dashboard-layout input:focus-visible,
+.dashboard-layout select:focus-visible,
+.dashboard-layout a:focus-visible {
+  outline: 2px solid #7888d0;
+  outline-offset: 2px;
+}
+
+.dashboard-layout .element-list button.selected,
+.dashboard-layout .product-card.is-selected,
+.dashboard-layout .store-content h2.is-selected,
+.dashboard-layout .buy-button.is-selected {
+  color: var(--app-pink-ink);
+  background: var(--app-pink);
+  border-color: #D47F9C;
+  box-shadow: inset 3px 0 #D47F9C, 0 0 0 1px #D47F9C;
+}
+
+.dashboard-layout .element-list button:hover:not(.selected),
+.dashboard-layout .element-list button.selected,
+.dashboard-layout .segmented-control button.selected,
+.dashboard-layout .viewport-control button.selected,
+.dashboard-layout .inspect-toggle.is-on,
+.dashboard-layout .version-item.active {
+  color: var(--app-periwinkle-ink);
+  background: #DCE2FA;
+  border-color: #AAB6ED;
+}
+
+.dashboard-layout .element-list button > svg,
+.dashboard-layout .element-panel .panel-heading > svg,
+.dashboard-layout .feature-index,
+.dashboard-layout .diff-arrow,
+.dashboard-layout .empty-mark,
+.dashboard-layout .version-title > svg {
+  color: var(--app-lavender-ink);
+}
+
+.dashboard-layout .feature-index,
+.dashboard-layout .version-item-index,
+.dashboard-layout .version-badge.version-original {
+  background: #E7D5F2;
+  border-color: #C39DDE;
+}
+
+.dashboard-layout .version-badge.version-original,
+.dashboard-layout .version-deployed,
+.dashboard-layout .version-item-badge {
+  color: var(--app-lavender-ink);
+}
+
+.dashboard-layout .version-item.active {
+  color: var(--app-periwinkle-ink);
+  background: var(--app-periwinkle);
+  border-color: #929fdd;
+  box-shadow: inset 0 0 0 1px #8291d1;
+}
+
+.dashboard-layout .status-pending,
+.dashboard-layout .element-status.status-pending,
+.dashboard-layout .version-deployed,
+.dashboard-layout .version-item-badge {
+  color: var(--app-lavender-ink);
+  background: #E7D5F2;
+  border-color: #C39DDE;
+}
+
+.dashboard-layout .status-applied,
+.dashboard-layout .status-verified,
+.dashboard-layout .element-status.status-applied,
+.dashboard-layout .toast-success,
+.dashboard-layout .checks-pass strong,
+.dashboard-layout .check-pass i,
+.dashboard-layout .team-boundary {
+  color: var(--app-sage-ink);
+  background: #DDEAD9;
+  border-color: #B6D0AF;
+}
+
+.dashboard-layout .status-rejected,
+.dashboard-layout .status-conflict,
+.dashboard-layout .status-verification_failed,
+.dashboard-layout .element-status.status-conflict,
+.dashboard-layout .toast-error,
+.dashboard-layout .stale-warning,
+.dashboard-layout .tracking-needs-review,
+.dashboard-layout .tracking-target-missing,
+.dashboard-layout .tracking-conflict-detected,
+.dashboard-layout .audit-conflict_detected,
+.dashboard-layout .audit-verification_failed {
+  color: var(--app-pink-ink);
+  background: #FAD3DF;
+  border-color: #E7A6BA;
+}
+
+.dashboard-layout .toast-success > span {
+  color: var(--app-sage-ink);
+  background: var(--app-sage);
+}
+
+.dashboard-layout .toast-error > span,
+.dashboard-layout .stale-warning .warning-icon {
+  color: var(--app-pink-ink);
+  background: var(--app-pink);
+}
+
+.dashboard-layout .warning-item,
+.dashboard-layout .inline-warning {
+  color: var(--app-pink-ink);
+  background: #FAD3DF;
+  border-color: #E7A6BA;
+}
+
+.dashboard-layout .warning-item p,
+.dashboard-layout .stale-warning p {
+  color: #704958;
+}
+
+.dashboard-layout .warning-icon {
+  color: var(--app-lavender-ink);
+  background: var(--app-lavender);
+}
+
+.dashboard-layout .conflict-actions button,
+.dashboard-layout .review-hint,
+.dashboard-layout .target-candidate {
+  color: var(--app-lavender-ink);
+  background: #E7D5F2;
+  border-color: #C39DDE;
+}
+
+.dashboard-layout .release-current,
+.dashboard-layout .release-details,
+.dashboard-layout .diff-after,
+.dashboard-layout .tracking-pill {
+  background: #DDEAD9;
+  border-color: #B6D0AF;
+}
+
+.dashboard-layout .audit-marker,
+.dashboard-layout .audit-patch_deployed,
+.dashboard-layout .audit-verification_passed,
+.dashboard-layout .audit-conflict_resolved {
+  background: var(--app-sage);
+}
+
+.dashboard-layout .audit-patch_rolled_back,
+.dashboard-layout .audit-patch_rejected {
+  background: var(--app-pink);
+}
+
+.dashboard-layout .audit-list code,
+.dashboard-layout .release-list code,
+.dashboard-layout .patch-identification strong,
+.dashboard-layout .patch-id {
+  color: var(--app-periwinkle-ink);
+}
+
+.dashboard-layout .version-item:hover,
+.dashboard-layout .version-nav-button:hover:not(:disabled),
+.dashboard-layout .reset-property-button:hover:not(:disabled) {
+  color: var(--app-periwinkle-ink);
+  background: #DCE2FA;
+  border-color: #AAB6ED;
+}
+
+.dashboard-layout .version-item.deployed {
+  background: #fff0f4;
+  border-color: #f0c1d1;
+}
+
+.dashboard-layout .team-boundary strong {
+  color: var(--app-sage-ink);
+}
+
+.dashboard-layout .panel,
+.dashboard-layout .history-panel,
+.dashboard-layout .audit-panel,
+.dashboard-layout .team-member,
+.dashboard-layout .assigned-patches,
+.dashboard-layout .version-history-panel {
+  border-color: #e1e3f0;
+  box-shadow: 0 5px 18px #303b6810, inset 0 1px #ffffff;
+}
